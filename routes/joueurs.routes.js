@@ -1,7 +1,11 @@
-// Routes des joueurs (placeholder)
 const express = require('express');
 const router = express.Router();
+const joueursController = require('../controllers/joueurs.controller');
 
-router.get('/', (req, res) => res.json({ message: 'Liste des joueurs (placeholder)' }));
+// GET /api/joueurs -> Liste les joueurs
+router.get('/', joueursController.lister);
+
+// POST /api/joueurs -> Crée un nouveau joueur
+router.post('/', joueursController.creer); 
 
 module.exports = router;
