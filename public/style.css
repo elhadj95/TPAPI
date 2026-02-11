@@ -23,8 +23,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: radial-gradient(circle at 20% 80%, #ffaa00 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, #ff6600 0%, transparent 50%);
+      background-image: radial-gradient(circle at 20% 80%, #0084ff26 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, #1e00ff64 0%, transparent 50%);
       opacity: 0.3;
       z-index: -1;
       animation: flicker 3s ease-in-out infinite alternate;
@@ -125,7 +125,7 @@
     }
 
     button:hover {
-      background: linear-gradient(145deg, #ffaa00, #ffff66);
+      background: linear-gradient(145deg, #1900ff8e, #ffff66);
       box-shadow: 0 0 20px rgba(255,165,0,0.7);
       transform: translateY(-2px);
     }
