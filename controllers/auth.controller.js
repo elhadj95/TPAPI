@@ -18,4 +18,4 @@ exports.login = (req, res) => {
         message: "Bonjour",
         token: resultat.token
     });
-}; 
+};

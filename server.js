@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
+
 const joueursRoutes = require('./routes/joueurs.routes');
+const authRoutes = require('./routes/auth.routes');
 
-//demarrer un serveur
+app.use(express.json());
+app.use(express.static('public'));
 
-app.get ('/',(req , res) => {res.send('Hello World')});
-
-
-app.listen ( 3000 , ( ) => { console.log ('Le serveur est en cours d \' exécution sur http://localhost:3000/')})
-app.use(express.json()); // Indispensable pour lire le JSON envoyé par le bouton "Forger Héros"
 app.use('/api/joueurs', joueursRoutes);
+app.use('/auth', authRoutes);
+
+app.listen(3000, () => {
+    console.log('http://localhost:3000/');
+});
