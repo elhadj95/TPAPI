@@ -1,11 +1,66 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <title>TP_API</title>
-  </head>
-  <body>
-    <h1>🧟</h1>
-    <script src="script.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🗡️ Rogue-Lite Donjon 🛡️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+ 
+</head>
+<body>
+  <div class="container">
+    <h1>🗡️ ROGUE-LITE DONJON 🛡️</h1>
+
+    <div class="panel">
+      <h2>🔑 Authentification</h2>
+      <div class="controls">
+        <div>
+          <input id="reg-username" placeholder="Username" />
+          <input id="reg-password" type="password" placeholder="Password" />
+          <select id="reg-role">
+            <option value="player">⚔️ Player</option>
+            <option value="admin">👑 Admin</option>
+          </select>
+          <button id="btn-register">INSCRIRE</button>
+        </div>
+        <div>
+          <input id="login-username" placeholder="Username" />
+          <input id="login-password" type="password" placeholder="Password" />
+          <button id="btn-login">CONNEXION</button>
+        </div>
+      </div>
+      <div class="status">Token: <span id="token">Aucun</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>⚔️ Créer Héros</h2>
+      <div class="controls">
+        <input id="player-name" placeholder="Nom du Héros" />
+        <button id="btn-create-player">FORGER HÉROS</button>
+      </div>
+      <div class="status">ID: <span id="player-id">-</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>🗺️ Exploration</h2>
+      <div class="game-stats">
+        <div class="stat">Game ID: <span id="game-id">-</span></div>
+        <div class="stat">Salle: <span id="current-room">-</span></div>
+        <div class="stat">Status: <span id="game-status">-</span></div>
+      </div>
+      <div class="controls">
+        <button id="btn-start-game">ENTRER DONJON</button>
+        <button id="btn-move">➡️ AVANCER</button>
+        <button id="btn-attack">⚔️ ATTAQUER</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>📜 Grimoire des Logs</h2>
+      <pre id="log">Bienvenue dans le donjon...\nPrêt à affronter les ténèbres ?</pre>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
