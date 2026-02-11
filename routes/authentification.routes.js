@@ -1,7 +1,21 @@
-// Routes d'authentification (placeholder)
-const express = require('express');
-const router = express.Router();
+const service = require('../services/auth.service');
 
-router.post('/login', (req, res) => res.json({ message: 'Connexion (placeholder)' }));
+exports.register = (req, res) => {
+    const infos = req.body;
+    const nouveauJoueur = service.createUser(infos);
+    
+    res.status(201).json({
+        message: "Joueur créé",
+        data: nouveauJoueur
+    });
+};
 
-module.exports = router;
+exports.login = (req, res) => {
+    const infos = req.body;
+    const resultat = service.login(infos);
+
+    res.json({
+        message: "Bonjour",
+        token: resultat.token
+    });
+}; 
