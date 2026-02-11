@@ -1,11 +1,238 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <title>TPAPI — Interface publique</title>
-  </head>
-  <body>
-    <h1>Interface publique (placeholder)</h1>
-    <script src="script.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🗡️ Rogue-Lite Donjon 🛡️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+      background-attachment: fixed;
+      font-family: 'Press Start 2P', monospace;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animations de particules (torches) */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(circle at 20% 80%, #ffaa00 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, #ff6600 0%, transparent 50%);
+      opacity: 0.3;
+      z-index: -1;
+      animation: flicker 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.2em;
+      color: #ffaa00;
+      text-shadow: 2px 2px 0 #000, 0 0 10px #ff6600;
+      margin-bottom: 30px;
+      letter-spacing: 4px;
+    }
+
+    .panel {
+      background: rgba(20, 20, 40, 0.9);
+      border: 3px solid #444;
+      border-image: linear-gradient(45deg, #ff6600, #ffaa00, #ffff66) 1;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255,102,0,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, transparent, rgba(255,102,0,0.1), transparent);
+      z-index: -1;
+      animation: borderGlow 2s linear infinite;
+    }
+
+    @keyframes borderGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .panel h2 {
+      color: #ffaa00;
+      font-size: 0.8em;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    input, select {
+      background: #2a2a3a;
+      border: 2px solid #555;
+      color: #e0e0e0;
+      padding: 8px 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.6em;
+      border-radius: 4px;
+      width: 100%;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #ff6600;
+      box-shadow: 0 0 10px rgba(255,102,0,0.5);
+    }
+
+    button {
+      background: linear-gradient(145deg, #ff6600, #ffaa00);
+      border: 2px solid #ff4400;
+      color: #111;
+      padding: 12px 20px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.7em;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      background: linear-gradient(145deg, #ffaa00, #ffff66);
+      box-shadow: 0 0 20px rgba(255,165,0,0.7);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .status {
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 0.6em;
+      margin-top: 10px;
+    }
+
+    #log {
+      background: #111;
+      color: #0f0;
+      padding: 15px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.65em;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .game-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      font-size: 0.7em;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 8px;
+      background: rgba(255,102,0,0.1);
+      border: 1px solid rgba(255,102,0,0.3);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🗡️ ROGUE-LITE DONJON 🛡️</h1>
+
+    <div class="panel">
+      <h2>🔑 Authentification</h2>
+      <div class="controls">
+        <div>
+          <input id="reg-username" placeholder="Username" />
+          <input id="reg-password" type="password" placeholder="Password" />
+          <select id="reg-role">
+            <option value="player">⚔️ Player</option>
+            <option value="admin">👑 Admin</option>
+          </select>
+          <button id="btn-register">INSCRIRE</button>
+        </div>
+        <div>
+          <input id="login-username" placeholder="Username" />
+          <input id="login-password" type="password" placeholder="Password" />
+          <button id="btn-login">CONNEXION</button>
+        </div>
+      </div>
+      <div class="status">Token: <span id="token">Aucun</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>⚔️ Créer Héros</h2>
+      <div class="controls">
+        <input id="player-name" placeholder="Nom du Héros" />
+        <button id="btn-create-player">FORGER HÉROS</button>
+      </div>
+      <div class="status">ID: <span id="player-id">-</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>🗺️ Exploration</h2>
+      <div class="game-stats">
+        <div class="stat">Game ID: <span id="game-id">-</span></div>
+        <div class="stat">Salle: <span id="current-room">-</span></div>
+        <div class="stat">Status: <span id="game-status">-</span></div>
+      </div>
+      <div class="controls">
+        <button id="btn-start-game">ENTRER DONJON</button>
+        <button id="btn-move">➡️ AVANCER</button>
+        <button id="btn-attack">⚔️ ATTAQUER</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>📜 Grimoire des Logs</h2>
+      <pre id="log">Bienvenue dans le donjon...\nPrêt à affronter les ténèbres ?</pre>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
