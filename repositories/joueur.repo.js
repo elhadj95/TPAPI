@@ -1,5 +1,10 @@
-const joueurs = [];
+const magasin = require('../data/magasin'); 
+
 module.exports = {
-  all: () => joueurs,
-  add: (j) => { joueurs.push(j); return j; }
+  all: () => magasin.joueurs,
+  add: (joueur) => {
+    magasin.joueurs.push(joueur);
+    return joueur;
+  },
+  findById: (id) => magasin.joueurs.find(j => j.id === id)
 };
