@@ -1,4 +1,3 @@
-// Répertoire joueur (placeholder)
 const joueurs = [];
 module.exports = {
   all: () => joueurs,
