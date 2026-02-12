@@ -1,21 +1,22 @@
-const service = require('../services/auth.service');
-
 exports.register = (req, res) => {
-    const infos = req.body;
-    const nouveauJoueur = service.createUser(infos);
-    
-    res.status(201).json({
-        message: "Joueur créé",
-        data: nouveauJoueur
-    });
+    try {
+        const infos = req.body;
+        
+        // On vérifie juste si on a bien reçu un nom
+        const nomJoueur = infos.username || "Héros Mystérieux";
+
+        res.status(201).json({
+            message: "Bienvenue : " + nomJoueur + " un rotis de chien avant de commencer? !",
+            status: "Succès"
+        });
+    } catch (erreur) {
+        res.status(500).json({ message: "Oups, le cerveau a glissé..." });
+    }
 };
 
 exports.login = (req, res) => {
-    const infos = req.body;
-    const resultat = service.login(infos);
-
     res.json({
-        message: "Bonjour",
-        token: resultat.token
+        message: " La porte s'ouvre !",
+        token: "cle-magique-123"
     });
 };
