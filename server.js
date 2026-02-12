@@ -15,6 +15,10 @@ app.use(express.static('public'));
 app.use('/auth', authRoutes);       // Pour le login/register
 app.use('/api/joueurs', joueursRoutes); // Pour ton bouton "Forger Héros"
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
+
 // 4. Lancement du serveur
 app.listen(3000, () => { 
     console.log("⚔️  Donjon opérationnel sur http://localhost:3000"); 
