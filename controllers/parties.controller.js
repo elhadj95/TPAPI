@@ -49,3 +49,20 @@ exports.deplacer = async (req, res) => {
   }
 };
 
+// POST /api/parties/:id/attack - Attaquer monstre
+exports.attaquer = async (req, res) => {
+  try {
+    const partie = await partiesService.findById(req.params.id);
+    if (!partie) return res.status(404).json({ error: 'Partie non trouvée' });
+    
+    if (partie.joueurMort) return res.status(400).json({ error: 'Joueur mort' });
+    if (!partie.salleActuelle.monstre) return res.status(400).json({ error: 'Aucun monstre' });
+    
+    const updated = await partiesService.attaquer(req.params.id);
+    if (updated.joueurMort) return res.json({ ...updated, message: 'Défaite !' });
+    if (!updated.salleActuelle.monstre) return res.json({ ...updated, message: 'Monstre vaincu ! Avancez' });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
