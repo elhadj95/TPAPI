@@ -25,8 +25,8 @@ function updateUI() {
   const zoneCombat = document.getElementById('zone-combat');
   if (gameState.inCombat && gameState.monster) {
     zoneCombat.style.display = 'block';
-    document.getElementById('nom-monstre').innerText = gameState.monster.nom;  
-    document.getElementById('pv-monstre').innerText = gameState.monster.pointsDeVie;  
+    document.getElementById('nom-monstre').innerText = gameState.monster.nom;
+    document.getElementById('pv-monstre').innerText = gameState.monster.pointsDeVie;
   } else {
     zoneCombat.style.display = 'none';
   }
@@ -127,11 +127,11 @@ document.getElementById('btn-chercher').addEventListener('click', async () => {
     const res = await fetch('/api/monstres/random');
     if (!res.ok) throw new Error("Erreur récupération monstre");
     
-    const response = await res.json();
-    gameState.monster = response.data;  
+    const monstre = await res.json();
+    gameState.monster = monstre;  // ✅ CORRIGÉ: sans .data
     gameState.inCombat = true;
     
-    log(`Un ${gameState.monster.nom} apparaît !`);  
+    log(`Un ${gameState.monster.nom} apparaît !`);
     updateUI();
   } catch (e) {
     log("Erreur: Impossible de récupérer un monstre depuis le serveur.");
@@ -143,11 +143,11 @@ document.getElementById('btn-attack').addEventListener('click', () => {
   if (!gameState.inCombat) return log("Personne à attaquer.");
   
   const dmg = 10;
-  gameState.monster.pointsDeVie -= dmg;  
+  gameState.monster.pointsDeVie -= dmg;
   log(`Vous infligez ${dmg} dégâts.`);
 
-  if (gameState.monster.pointsDeVie <= 0) {  
-    log(`Le ${gameState.monster.nom} est vaincu.`);  
+  if (gameState.monster.pointsDeVie <= 0) {
+    log(`Le ${gameState.monster.nom} est vaincu.`);
     gameState.inCombat = false;
     gameState.monster = null;
   }
