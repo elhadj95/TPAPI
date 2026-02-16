@@ -1,114 +1,156 @@
-// 1. Sélection des éléments de l'interface
-const btnCreatePlayer = document.getElementById('btn-create-player');
-const playerNameInput = document.getElementById('player-name');
-const playerIdSpan = document.getElementById('player-id');
-const logPre = document.getElementById('log');
+const gameState = {
+  token: null,
+  hero: null,
+  gameId: null,
+  room: 0,
+  inCombat: false,
+  monster: null
+};
 
-// 2. Fonction utilitaire pour écrire dans le grimoire (logs)
-function addLog(message) {
-  const timestamp = new Date().toLocaleTimeString();
-  logPre.textContent += `\n[${timestamp}] ${message}`;
-  logPre.scrollTop = logPre.scrollHeight; // Garde le log à jour en bas
+const logEl = document.getElementById('log');
+
+function log(message) {
+  const time = new Date().toLocaleTimeString();
+  logEl.innerHTML += `\n[${time}] ${message}`;
+  logEl.scrollTop = logEl.scrollHeight;
 }
 
-// 3. Logique du bouton "FORGER HÉROS"
-btnCreatePlayer.addEventListener('click', async () => {
-  const name = playerNameInput.value.trim();
+function updateUI() {
+  document.getElementById('token').innerText = gameState.token ? "Actif" : "Aucun";
+  document.getElementById('player-id').innerText = gameState.hero ? gameState.hero.name : "-";
+  document.getElementById('game-id').innerText = gameState.gameId || "-";
+  document.getElementById('current-room').innerText = gameState.room;
+  document.getElementById('game-status').innerText = gameState.inCombat ? "COMBAT" : "Exploration";
 
-  if (!name) {
-    addLog("⚠️ Grimoire : Un héros ne peut pas être forgé sans nom !");
-    return;
+  const zoneCombat = document.getElementById('zone-combat');
+  if (gameState.inCombat && gameState.monster) {
+    zoneCombat.style.display = 'block';
+    document.getElementById('nom-monstre').innerText = gameState.monster.name;
+    document.getElementById('pv-monstre').innerText = gameState.monster.hp;
+  } else {
+    zoneCombat.style.display = 'none';
   }
+}
+
+document.getElementById('btn-register').addEventListener('click', async () => {
+  const username = document.getElementById('reg-username').value;
+  const password = document.getElementById('reg-password').value;
+  const role = document.getElementById('reg-role').value;
 
   try {
-    // Envoi de la requête au serveur 
-    const response = await fetch('/api/joueurs', {
+    const res = await fetch('/auth/register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ nom: name }) // Le corps de la requête
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, role })
     });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      // Si le serveur répond 201 (Succès)
-      playerIdSpan.textContent = data.id; // Affiche l'ID généré par ton utilitaire
-      addLog(`✨ Forge réussie : ${data.nom} (Niveau ${data.niveau}) est prêt !`);
-      playerNameInput.value = ''; // Vide le champ après création
-    } else {
-      addLog(`❌ Échec de la forge : ${data.message}`);
-    }
-  } catch (error) {
-    addLog("❌ Le serveur est injoignable. Le donjon est fermé.");
-    console.error("Erreur Fetch :", error);
+    const data = await res.json();
+    if (res.ok) log(`Inscription réussie: ${username}`);
+    else log(`Erreur: ${data.message}`);
+  } catch (e) {
+    log("Erreur serveur lors de l'inscription");
   }
 });
-const grimoire = document.getElementById('log');
 
-document.getElementById('btn-register').onclick = async () => {
-    const username = document.getElementById('reg-username').value;
-    
-    const reponse = await fetch('/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username })
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+
+  try {
+    const res = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
     });
-
-    const resultat = await reponse.json();
-    
-    // On ajoute le texte dans le grimoire sans effacer l'ancien
-    grimoire.innerHTML += "\n> " + resultat.message;
-};
-
-// Fonction pour invoquer un monstre dans le donjon
-async function chercherCombat() {
-    try {
-        const response = await fetch('/api/monstres/random');
-        const resultat = await response.json();
-        
-        if (response.ok) {
-            const monstre = resultat.data;
-            // On affiche le monstre dans le grimoire
-            const grimoire = document.getElementById('log');
-            grimoire.innerHTML += `\n⚠️ ${resultat.message} : <b>${monstre.nom}</b> (PV: ${monstre.pointsDeVie}, ATK: ${monstre.attaque}) surgit !`;
-        }
-    } catch (error) {
-        console.error("Erreur lors de la recherche de combat", error);
+    const data = await res.json();
+    if (res.ok) {
+      gameState.token = data.token;
+      log(`Connexion réussie: ${username}`);
+      updateUI();
+    } else {
+      log(`Erreur: ${data.message}`);
     }
-}
+  } catch (e) {
+    log("Erreur serveur lors de la connexion");
+  }
+});
 
-let monstreActuel = null;
-
-// CHERCHER UN COMBAT
-document.getElementById('btn-chercher').onclick = async () => {
-    const response = await fetch('/api/monstres/random');
-    const res = await response.json();
-    
-    if (response.ok) {
-        monstreActuel = res.data;
-        document.getElementById('nom-monstre').textContent = monstreActuel.nom;
-        document.getElementById('pv-monstre').textContent = monstreActuel.pointsDeVie;
-        document.getElementById('btn-attaquer').style.display = 'inline-block';
-        addLog(`⚠️ Un ${monstreActuel.nom} bloque le chemin !`);
+document.getElementById('btn-create-player').addEventListener('click', async () => {
+  if (!gameState.token) return log("Veuillez vous connecter d'abord.");
+  
+  const name = document.getElementById('player-name').value;
+  
+  try {
+    const res = await fetch('/joueurs', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${gameState.token}`
+      },
+      body: JSON.stringify({ name })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      gameState.hero = data;
+      log(`Héros ${name} créé.`);
+      updateUI();
+    } else {
+      log(`Erreur: ${data.message}`);
     }
-};
+  } catch (e) {
+    log("Erreur serveur création héros");
+  }
+});
 
-// ATTAQUER
-document.getElementById('btn-attack').onclick = async () => {
-    const joueurId = document.getElementById('player-id').textContent;
-    
-    // Pour simplifier sans créer de route de combat complexe tout de suite :
-    const degats = Math.floor(Math.random() * 20);
-    monstreActuel.pointsDeVie -= degats;
-    
-    document.getElementById('pv-monstre').textContent = monstreActuel.pointsDeVie;
-    addLog(`⚔️ Tu frappes le ${monstreActuel.nom} pour ${degats} dégâts !`);
+document.getElementById('btn-start-game').addEventListener('click', () => {
+  if (!gameState.hero) return log("Créez un héros d'abord.");
+  
+  gameState.gameId = "G-" + Math.floor(Math.random() * 1000);
+  gameState.room = 1;
+  gameState.inCombat = false;
+  log("Vous entrez dans le donjon.");
+  updateUI();
+});
 
-    if (monstreActuel.pointsDeVie <= 0) {
-        addLog(`🏆 VICTOIRE ! Le ${monstreActuel.nom} est terrassé !`);
-        document.getElementById('btn-attaquer').style.display = 'none';
-        monstreActuel = null;
-    }
-};
+document.getElementById('btn-move').addEventListener('click', () => {
+  if (!gameState.gameId) return;
+  if (gameState.inCombat) return log("Combat en cours !");
+  
+  gameState.room++;
+  log(`Vous avancez salle ${gameState.room}.`);
+  updateUI();
+});
+
+document.getElementById('btn-chercher').addEventListener('click', async () => {
+  if (!gameState.gameId || gameState.inCombat) return;
+
+  try {
+    const res = await fetch('/monstres/random');
+    if (!res.ok) throw new Error("Erreur récupération monstre");
+    
+    const monstre = await res.json();
+    
+    gameState.monster = monstre;
+    gameState.inCombat = true;
+    
+    log(`Un ${gameState.monster.name} apparaît !`);
+    updateUI();
+  } catch (e) {
+    log("Erreur: Impossible de récupérer un monstre depuis le serveur.");
+    console.error(e);
+  }
+});
+
+document.getElementById('btn-attack').addEventListener('click', () => {
+  if (!gameState.inCombat) return log("Personne à attaquer.");
+  
+  const dmg = 10;
+  gameState.monster.hp -= dmg;
+  log(`Vous infligez ${dmg} dégâts.`);
+
+  if (gameState.monster.hp <= 0) {
+    log(`Le ${gameState.monster.name} est vaincu.`);
+    gameState.inCombat = false;
+    gameState.monster = null;
+  }
+  updateUI();
+});
