@@ -25,8 +25,8 @@ function updateUI() {
   const zoneCombat = document.getElementById('zone-combat');
   if (gameState.inCombat && gameState.monster) {
     zoneCombat.style.display = 'block';
-    document.getElementById('nom-monstre').innerText = gameState.monster.name;
-    document.getElementById('pv-monstre').innerText = gameState.monster.hp;
+    document.getElementById('nom-monstre').innerText = gameState.monster.nom;  
+    document.getElementById('pv-monstre').innerText = gameState.monster.pointsDeVie;  
   } else {
     zoneCombat.style.display = 'none';
   }
@@ -80,13 +80,13 @@ document.getElementById('btn-create-player').addEventListener('click', async () 
   const name = document.getElementById('player-name').value;
   
   try {
-    const res = await fetch('/joueurs', {
+    const res = await fetch('/api/joueurs', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${gameState.token}`
       },
-      body: JSON.stringify({ name })
+      body: JSON.stringify({ nom: name })
     });
     const data = await res.json();
     if (res.ok) {
@@ -124,15 +124,14 @@ document.getElementById('btn-chercher').addEventListener('click', async () => {
   if (!gameState.gameId || gameState.inCombat) return;
 
   try {
-    const res = await fetch('/monstres/random');
+    const res = await fetch('/api/monstres/random');
     if (!res.ok) throw new Error("Erreur récupération monstre");
     
-    const monstre = await res.json();
-    
-    gameState.monster = monstre;
+    const response = await res.json();
+    gameState.monster = response.data;  
     gameState.inCombat = true;
     
-    log(`Un ${gameState.monster.name} apparaît !`);
+    log(`Un ${gameState.monster.nom} apparaît !`);  
     updateUI();
   } catch (e) {
     log("Erreur: Impossible de récupérer un monstre depuis le serveur.");
@@ -144,11 +143,11 @@ document.getElementById('btn-attack').addEventListener('click', () => {
   if (!gameState.inCombat) return log("Personne à attaquer.");
   
   const dmg = 10;
-  gameState.monster.hp -= dmg;
+  gameState.monster.pointsDeVie -= dmg;  
   log(`Vous infligez ${dmg} dégâts.`);
 
-  if (gameState.monster.hp <= 0) {
-    log(`Le ${gameState.monster.name} est vaincu.`);
+  if (gameState.monster.pointsDeVie <= 0) {  
+    log(`Le ${gameState.monster.nom} est vaincu.`);  
     gameState.inCombat = false;
     gameState.monster = null;
   }

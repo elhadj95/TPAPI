@@ -29,7 +29,7 @@ exports.creerPartie = async (joueurId) => {
     id: partiesRepo.createPartie({ joueurId, pvJoueur: 100, salleActuelle: 1, donjon, terminee: false, joueurMort: false })
   };
   
-  await partiesRepo.save(partie); 
+  await partiesRepo.save(partie); // Persist si repo le fait
   return partie;
 };
 
