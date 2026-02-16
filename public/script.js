@@ -61,3 +61,54 @@ document.getElementById('btn-register').onclick = async () => {
     // On ajoute le texte dans le grimoire sans effacer l'ancien
     grimoire.innerHTML += "\n> " + resultat.message;
 };
+
+// Fonction pour invoquer un monstre dans le donjon
+async function chercherCombat() {
+    try {
+        const response = await fetch('/api/monstres/random');
+        const resultat = await response.json();
+        
+        if (response.ok) {
+            const monstre = resultat.data;
+            // On affiche le monstre dans le grimoire
+            const grimoire = document.getElementById('log');
+            grimoire.innerHTML += `\n⚠️ ${resultat.message} : <b>${monstre.nom}</b> (PV: ${monstre.pointsDeVie}, ATK: ${monstre.attaque}) surgit !`;
+        }
+    } catch (error) {
+        console.error("Erreur lors de la recherche de combat", error);
+    }
+}
+
+let monstreActuel = null;
+
+// CHERCHER UN COMBAT
+document.getElementById('btn-chercher').onclick = async () => {
+    const response = await fetch('/api/monstres/random');
+    const res = await response.json();
+    
+    if (response.ok) {
+        monstreActuel = res.data;
+        document.getElementById('nom-monstre').textContent = monstreActuel.nom;
+        document.getElementById('pv-monstre').textContent = monstreActuel.pointsDeVie;
+        document.getElementById('btn-attaquer').style.display = 'inline-block';
+        addLog(`⚠️ Un ${monstreActuel.nom} bloque le chemin !`);
+    }
+};
+
+// ATTAQUER
+document.getElementById('btn-attack').onclick = async () => {
+    const joueurId = document.getElementById('player-id').textContent;
+    
+    // Pour simplifier sans créer de route de combat complexe tout de suite :
+    const degats = Math.floor(Math.random() * 20);
+    monstreActuel.pointsDeVie -= degats;
+    
+    document.getElementById('pv-monstre').textContent = monstreActuel.pointsDeVie;
+    addLog(`⚔️ Tu frappes le ${monstreActuel.nom} pour ${degats} dégâts !`);
+
+    if (monstreActuel.pointsDeVie <= 0) {
+        addLog(`🏆 VICTOIRE ! Le ${monstreActuel.nom} est terrassé !`);
+        document.getElementById('btn-attaquer').style.display = 'none';
+        monstreActuel = null;
+    }
+};

@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const monstreRoutes = require('./routes/monstres.routes');
 
 // 1. Importation des routes
 // On utilise le nom choisi par tes collègues pour l'auth
@@ -14,6 +15,7 @@ app.use(express.static('public'));
 // 3. Branchement des points d'entrée (Endpoints)
 app.use('/auth', authRoutes);       // Pour le login/register
 app.use('/api/joueurs', joueursRoutes); // Pour ton bouton "Forger Héros"
+app.use('/api/monstres', monstreRoutes);
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
