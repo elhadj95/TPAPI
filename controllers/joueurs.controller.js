@@ -1,9 +1,3 @@
-const joueursService = require('../services/joueurs.service');
-
-exports.lister = (req, res) => {
-  res.json(joueursService.getAll());
-};
-
 exports.creer = (req, res) => {
   try {
     const { nom } = req.body; 
